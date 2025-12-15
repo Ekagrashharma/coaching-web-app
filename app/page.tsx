@@ -91,7 +91,7 @@ export default function HomePage() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="#courses">View Courses</Link>
+              <Link href="/payment">Submit Fee</Link>
             </Button>
           </div>
         </div>
