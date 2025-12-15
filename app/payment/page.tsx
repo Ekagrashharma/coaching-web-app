@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { GraduationCap, ArrowLeft, CheckCircle, Upload, Copy, Check } from "lucide-react"
+import { GraduationCap, ArrowLeft, CheckCircle, Upload, Copy, Check, Download } from "lucide-react"
 import { getApplicationById, getCourses, savePayment, type Payment } from "@/lib/data-store"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function PaymentPage() {
   const [step, setStep] = useState<"lookup" | "payment" | "success">("lookup")
@@ -20,11 +21,28 @@ export default function PaymentPage() {
   const [copied, setCopied] = useState(false)
   const [paymentId, setPaymentId] = useState("")
   const [screenshotPreview, setScreenshotPreview] = useState<string>("")
-
+  const [isMonthlyFee, setIsMonthlyFee] = useState(false)
+  const [monthlyFeeData, setMonthlyFeeData] = useState({
+    studentId: "",
+    courseName: "",
+  })
   const [paymentData, setPaymentData] = useState({
     upiId: "",
     transactionId: "",
   })
+
+  const handleMonthlyFeeSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsMonthlyFee(true)
+    setApplication({
+      id: monthlyFeeData.studentId,
+      studentName: "Existing Student",
+      courseName: monthlyFeeData.courseName,
+      courseId: 1, // Default course ID for monthly fee
+    })
+    setError("")
+    setStep("payment")
+  }
 
   const handleLookup = (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,6 +60,7 @@ export default function PaymentPage() {
 
     setApplication(app)
     setError("")
+    setIsMonthlyFee(false)
     setStep("payment")
   }
 
@@ -65,16 +84,23 @@ export default function PaymentPage() {
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    let paymentAmount = 0
+    if (isMonthlyFee) {
+      paymentAmount = 10000 // Default monthly fee amount
+    } else {
+      paymentAmount = Number.parseInt(
+        getCourses()
+          .find((c) => c.id === application.courseId)
+          ?.fee.replace(/[^0-9]/g, "") || "0",
+      )
+    }
+
     const newPayment: Payment = {
       id: `PAY${Date.now()}`,
       applicationId: application.id,
       studentName: application.studentName,
       courseName: application.courseName,
-      amount: Number.parseInt(
-        getCourses()
-          .find((c) => c.id === application.courseId)
-          ?.fee.replace(/[^0-9]/g, "") || "0",
-      ),
+      amount: paymentAmount,
       upiId: paymentData.upiId,
       transactionId: paymentData.transactionId,
       status: "pending",
@@ -87,11 +113,63 @@ export default function PaymentPage() {
     setStep("success")
   }
 
+  const handleDownloadReceipt = () => {
+    const displayAmount = isMonthlyFee ? "₹10,000" : getCourses().find((c) => c.id === application?.courseId)?.fee
+
+    const receiptContent = `
+EXCEL ACADEMY
+Leading Coaching Institute
+================================================
+
+PAYMENT RECEIPT
+================================================
+
+Receipt ID:        ${paymentId}
+Date:              ${new Date().toLocaleDateString("en-IN")}
+
+STUDENT DETAILS:
+${isMonthlyFee ? `Student ID:        ${application?.id}` : `Application ID:    ${application?.id}`}
+${!isMonthlyFee ? `Student Name:      ${application?.studentName}` : ""}
+Course:            ${application?.courseName}
+
+PAYMENT DETAILS:
+${isMonthlyFee ? "Monthly Fee:" : "Total Amount:"}       ${displayAmount}
+UPI ID:            ${paymentData.upiId}
+Transaction ID:    ${paymentData.transactionId}
+Payment Status:    Pending Verification
+
+================================================
+
+This receipt confirms that your payment has been 
+submitted and is under verification.
+
+You will receive a confirmation email once the
+payment is verified by our team within 24 hours.
+
+For any queries, please contact:
+Phone: +91 98765 43210
+Email: info@excelacademy.com
+
+================================================
+Thank you for choosing Excel Academy!
+`
+
+    const blob = new Blob([receiptContent], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `payment-receipt-${paymentId}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   if (step === "success") {
     return (
       <div className="min-h-screen bg-background">
         <header className="border-b">
-          <div className="container flex h-16 items-center justify-between">
+          <div className="container mx-auto px-4 md:px-6 flex h-16 items-center justify-between max-w-7xl">
             <div className="flex items-center gap-2">
               <GraduationCap className="h-6 w-6 text-primary" />
               <span className="text-xl font-semibold">Excel Academy</span>
@@ -99,7 +177,7 @@ export default function PaymentPage() {
           </div>
         </header>
 
-        <div className="container py-12 md:py-24">
+        <div className="container mx-auto px-4 md:px-6 py-12 md:py-24 max-w-7xl">
           <div className="max-w-2xl mx-auto">
             <Card className="text-center">
               <CardHeader>
@@ -126,7 +204,11 @@ export default function PaymentPage() {
                   </ol>
                 </div>
 
-                <div className="pt-4">
+                <div className="flex flex-col gap-3 pt-4">
+                  <Button onClick={handleDownloadReceipt} variant="outline" className="w-full bg-transparent">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Receipt
+                  </Button>
                   <Button className="w-full" asChild>
                     <Link href="/">Back to Home</Link>
                   </Button>
@@ -141,11 +223,12 @@ export default function PaymentPage() {
 
   if (step === "payment" && application) {
     const course = getCourses().find((c) => c.id === application.courseId)
+    const displayAmount = isMonthlyFee ? "₹10,000" : course?.fee
 
     return (
       <div className="min-h-screen bg-background">
         <header className="border-b">
-          <div className="container flex h-16 items-center justify-between">
+          <div className="container mx-auto px-4 md:px-6 flex h-16 items-center justify-between max-w-7xl">
             <div className="flex items-center gap-2">
               <GraduationCap className="h-6 w-6 text-primary" />
               <span className="text-xl font-semibold">Excel Academy</span>
@@ -157,40 +240,44 @@ export default function PaymentPage() {
           </div>
         </header>
 
-        <div className="container py-8 md:py-12">
+        <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-7xl">
           <div className="max-w-3xl mx-auto">
             <div className="mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">Fee Payment</h1>
-              <p className="text-muted-foreground">Complete your admission by paying the course fees</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                {isMonthlyFee ? "Monthly Fee Payment" : "Fee Payment"}
+              </h1>
+              <p className="text-muted-foreground">
+                {isMonthlyFee ? "Submit your monthly fee payment" : "Complete your admission by paying the course fees"}
+              </p>
             </div>
 
             <div className="space-y-6">
-              {/* Application Details */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Application Details</CardTitle>
+                  <CardTitle>{isMonthlyFee ? "Payment Details" : "Application Details"}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Application ID:</span>
+                    <span className="text-muted-foreground">{isMonthlyFee ? "Student ID:" : "Application ID:"}</span>
                     <span className="font-medium">{application.id}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Student Name:</span>
-                    <span className="font-medium">{application.studentName}</span>
-                  </div>
+                  {!isMonthlyFee && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Student Name:</span>
+                      <span className="font-medium">{application.studentName}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Course:</span>
                     <span className="font-medium">{application.courseName}</span>
                   </div>
                   <div className="flex justify-between text-lg">
-                    <span className="font-semibold">Total Amount:</span>
-                    <span className="font-bold text-primary">{course?.fee}</span>
+                    <span className="font-semibold">{isMonthlyFee ? "Monthly Amount:" : "Total Amount:"}</span>
+                    <span className="font-bold text-primary">{displayAmount}</span>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* UPI Payment Details */}
               <Card>
                 <CardHeader>
                   <CardTitle>UPI Payment Details</CardTitle>
@@ -226,7 +313,6 @@ export default function PaymentPage() {
                 </CardContent>
               </Card>
 
-              {/* Payment Confirmation Form */}
               <form onSubmit={handlePaymentSubmit}>
                 <Card>
                   <CardHeader>
@@ -306,7 +392,7 @@ export default function PaymentPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container mx-auto px-4 md:px-6 flex h-16 items-center justify-between max-w-7xl">
           <div className="flex items-center gap-2">
             <GraduationCap className="h-6 w-6 text-primary" />
             <span className="text-xl font-semibold">Excel Academy</span>
@@ -320,41 +406,108 @@ export default function PaymentPage() {
         </div>
       </header>
 
-      <div className="container py-12 md:py-24">
-        <div className="max-w-md mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pay Admission Fees</CardTitle>
-              <CardDescription>Enter your application ID to proceed with fee payment</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleLookup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="appId">Application ID</Label>
-                  <Input
-                    id="appId"
-                    value={applicationId}
-                    onChange={(e) => setApplicationId(e.target.value)}
-                    placeholder="APP1234567890"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Enter the Application ID you received after submitting your application
-                  </p>
-                </div>
+      <div className="container mx-auto px-4 md:px-6 py-12 md:py-24 max-w-7xl">
+        <div className="max-w-4xl mx-auto">
+          <Tabs defaultValue="admission" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="admission">New Admission Fee</TabsTrigger>
+              <TabsTrigger value="monthly">Monthly Fee Payment</TabsTrigger>
+            </TabsList>
 
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
+            <TabsContent value="admission">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pay Admission Fees</CardTitle>
+                  <CardDescription>Enter your application ID to proceed with fee payment</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleLookup} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="appId">Application ID</Label>
+                      <Input
+                        id="appId"
+                        value={applicationId}
+                        onChange={(e) => setApplicationId(e.target.value)}
+                        placeholder="APP1234567890"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Enter the Application ID you received after submitting your application
+                      </p>
+                    </div>
 
-                <Button type="submit" className="w-full">
-                  Continue to Payment
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    )}
+
+                    <Button type="submit" className="w-full">
+                      Continue to Payment
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="monthly">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Monthly Fee Payment</CardTitle>
+                  <CardDescription>For existing students to pay monthly fees</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleMonthlyFeeSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="studentId">Student ID</Label>
+                      <Input
+                        id="studentId"
+                        value={monthlyFeeData.studentId}
+                        onChange={(e) => setMonthlyFeeData((prev) => ({ ...prev, studentId: e.target.value }))}
+                        placeholder="STU1234567890"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Enter your Student ID provided after admission confirmation
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="courseName">Enrolled Course</Label>
+                      <Select
+                        value={monthlyFeeData.courseName}
+                        onValueChange={(value) => setMonthlyFeeData((prev) => ({ ...prev, courseName: value }))}
+                        required
+                      >
+                        <SelectTrigger id="courseName">
+                          <SelectValue placeholder="Select your course" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getCourses().map((course) => (
+                            <SelectItem key={course.id} value={course.name}>
+                              {course.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">Select the course you are enrolled in</p>
+                    </div>
+
+                    <Alert>
+                      <AlertDescription className="text-sm">
+                        <strong>Note:</strong> Monthly fee amount is ₹10,000. You will be directed to the payment page
+                        after submitting this form.
+                      </AlertDescription>
+                    </Alert>
+
+                    <Button type="submit" className="w-full">
+                      Continue to Payment
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
