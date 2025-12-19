@@ -80,7 +80,7 @@ export default function AdminDashboard() {
         <div className="container mx-auto px-4 md:px-6 flex h-16 items-center justify-between max-w-7xl">
           <div className="flex items-center gap-2">
             <GraduationCap className="h-6 w-6 text-primary" />
-            <span className="text-xl font-semibold">Excel Academy</span>
+            <span className="text-xl font-semibold">Adhyan Insitute </span>
             <Badge variant="secondary" className="ml-2">
               Admin
             </Badge>

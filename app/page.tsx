@@ -7,9 +7,9 @@ export default function HomePage() {
   const courses = [
     {
       id: 1,
-      name: "JEE Main & Advanced",
-      duration: "2 Years",
-      batch: "2024-2026",
+      name: "Class 9 Batch: shivam sir",
+      duration: "1 Month",
+      batch: "9th",
       fee: "₹1,20,000",
       description: "Comprehensive program for engineering entrance preparation",
       features: ["Expert Faculty", "Daily Practice", "Mock Tests", "Study Material"],
@@ -46,11 +46,11 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="container mx-auto px-4 md:px-6 flex h-16 items-center justify-between max-w-7xl">
           <div className="flex items-center gap-2">
             <GraduationCap className="h-6 w-6 text-primary" />
-            <span className="text-xl font-semibold">Excel Academy</span>
+            <span className="text-xl font-semibold">Adhyan Coaching insitute</span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#courses" className="text-sm font-medium hover:text-primary transition-colors">
@@ -255,7 +255,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <GraduationCap className="h-5 w-5 text-primary" />
-                <span className="font-semibold">Excel Academy</span>
+                <span className="font-semibold">Adhyan Institute</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Leading coaching institute for competitive exam preparation
@@ -304,14 +304,14 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold mb-3">Contact</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>123 Main Street, City</li>
+                <li>Bank of Baroda, Harunagla, Bareilly </li>
                 <li>+91 98765 43210</li>
-                <li>info@excelacademy.com</li>
+                <li>info@adhyaninstitute.com</li>
               </ul>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-            <p>&copy; 2025 Excel Academy. All rights reserved.</p>
+            <p>&copy; 2025 Adhyan institute . All rights reserved.</p>
           </div>
         </div>
       </footer>
