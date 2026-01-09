@@ -23,7 +23,7 @@ const Hero = () => {
                 </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                <Link href="/payment">Submit Fee</Link>
+                <Link href="/pay">Submit Fee</Link>
                 </Button>
             </div>
             </div>
