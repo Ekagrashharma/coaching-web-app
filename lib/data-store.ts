@@ -152,7 +152,8 @@ export function updateApplication(id: string, updates: Partial<Application>) {
 
 export function getApplicationById(id: string): Application | null {
   const applications = getApplications()
-  return applications.find((app) => app.id === id) || null
+ // return applications.find((app)=>app.id)|| "APP3467575468"
+   return applications.find((app) => app.id === id) || null
 }
 
 // Payment management
