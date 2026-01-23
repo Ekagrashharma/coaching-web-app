@@ -52,12 +52,12 @@ export default function AdminDashboard() {
     loadData()
     setSelectedApplication(null)
   }
-
+*/
   const handlePaymentAction = (id: string, status: "verified" | "rejected") => {
     updatePayment(id, { status })
     loadData()
     setSelectedPayment(null)
-  }*/
+  }
 
   if (!user || user.role !== "admin") {
     return null
@@ -65,8 +65,8 @@ export default function AdminDashboard() {
 
   const stats = {
     totalApplications: applications.length,
-    pendingApplications: applications.filter((a) => a.status === "pending").length,
-    approvedApplications: applications.filter((a) => a.status === "approved").length,
+    // pendingApplications: applications.filter((a) => a.status === "pending").length,
+    // approvedApplications: applications.filter((a) => a.status === "approved").length,
     totalPayments: payments.length,
     pendingPayments: payments.filter((p) => p.status === "pending").length,
     verifiedPayments: payments.filter((p) => p.status === "verified").length,
@@ -106,11 +106,11 @@ export default function AdminDashboard() {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="applications">
               Applications
-              {stats.pendingApplications > 0 && (
+              {/* {stats.pendingApplications > 0 && (
                 <Badge variant="destructive" className="ml-2 h-5 min-w-5 px-1">
                   {stats.pendingApplications}
                 </Badge>
-              )}
+              )} */}
             </TabsTrigger>
             <TabsTrigger value="payments">
               Payments
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <div className="flex items-center gap-2">
                     <Clock className="h-5 w-5 text-orange-500" />
-                    <span className="text-3xl font-bold">{stats.pendingApplications}</span>
+                    {/* <span className="text-3xl font-bold">{stats.pendingApplications}</span> */}
                   </div>
                 </CardContent>
               </Card>
@@ -462,7 +462,7 @@ export default function AdminDashboard() {
                 <div className="flex gap-3 pt-4">
                   <Button
                     className="flex-1"
-                    onClick={() => handleApplicationAction(selectedApplication.id, "approved")}
+                    // onClick={() => handleApplicationAction(selectedApplication.id, "approved"}
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Approve
@@ -470,7 +470,7 @@ export default function AdminDashboard() {
                   <Button
                     className="flex-1"
                     variant="destructive"
-                    onClick={() => handleApplicationAction(selectedApplication.id, "rejected")}
+                    // onClick={() => handleApplicationAction(selectedApplication.id, "rejected")}
                   >
                     <XCircle className="mr-2 h-4 w-4" />
                     Reject
