@@ -191,7 +191,7 @@ export default function AdminDashboard() {
                             <p className="font-medium">{app.studentName}</p>
                             <p className="text-sm text-muted-foreground">{app.courseName}</p>
                           </div>
-                          <Badge
+                          {/* <Badge
                             variant={
                               app.status === "approved"
                                 ? "default"
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
                             }
                           >
                             {app.status}
-                          </Badge>
+                          </Badge> */}
                         </div>
                       ))}
                     </div>
@@ -265,8 +265,8 @@ export default function AdminDashboard() {
                           <TableHead>Course</TableHead>
                           <TableHead>Email</TableHead>
                           <TableHead>Phone</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Actions</TableHead>
+                          {/* <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead> */}
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -277,7 +277,7 @@ export default function AdminDashboard() {
                             <TableCell className="text-sm">{app.courseName}</TableCell>
                             <TableCell className="text-sm">{app.email}</TableCell>
                             <TableCell className="text-sm">{app.phone}</TableCell>
-                            <TableCell>
+                            {/* <TableCell>
                               <Badge
                                 variant={
                                   app.status === "approved"
@@ -294,7 +294,7 @@ export default function AdminDashboard() {
                               <Button size="sm" variant="ghost" onClick={() => setSelectedApplication(app)}>
                                 <Eye className="h-4 w-4" />
                               </Button>
-                            </TableCell>
+                            </TableCell> */}
                           </TableRow>
                         ))}
                       </TableBody>
@@ -391,7 +391,7 @@ export default function AdminDashboard() {
                   <p className="text-sm text-muted-foreground">Application ID</p>
                   <p className="font-mono font-medium">{selectedApplication.id}</p>
                 </div>
-                <div>
+                {/* <div>
                   <p className="text-sm text-muted-foreground">Status</p>
                   <Badge
                     variant={
@@ -404,7 +404,7 @@ export default function AdminDashboard() {
                   >
                     {selectedApplication.status}
                   </Badge>
-                </div>
+                </div> */}
                 <div>
                   <p className="text-sm text-muted-foreground">Student Name</p>
                   <p className="font-medium">{selectedApplication.studentName}</p>
@@ -458,7 +458,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {selectedApplication.status === "pending" && (
+              {/* {selectedApplication.status === "pending" && (
                 <div className="flex gap-3 pt-4">
                   <Button
                     className="flex-1"
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
                     Reject
                   </Button>
                 </div>
-              )}
+              )} */}
             </div>
           )}
         </DialogContent>

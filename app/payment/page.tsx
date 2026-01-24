@@ -4,6 +4,7 @@ import type React from "react";
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import html2pdf from "html2pdf.js";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,6 +41,7 @@ import {
 } from "@/components/ui/select";
 
 export default function PaymentPage() {
+  const courses = getCourses()
   const [step, setStep] = useState<"lookup" | "payment" | "success">("lookup");
   const [applicationId, setApplicationId] = useState("");
   const [application, setApplication] = useState<any>(null);
@@ -49,7 +51,7 @@ export default function PaymentPage() {
   const [screenshotPreview, setScreenshotPreview] = useState<string>("");
   const [isMonthlyFee, setIsMonthlyFee] = useState(false);
   const [monthlyFeeData, setMonthlyFeeData] = useState({
-    studentId: "",
+    applicationId: "",
     courseName: "",
   });
   const [paymentData, setPaymentData] = useState({
@@ -61,10 +63,9 @@ export default function PaymentPage() {
     e.preventDefault();
     setIsMonthlyFee(true);
     setApplication({
-      id: monthlyFeeData.studentId,
+      id: monthlyFeeData.applicationId,
       studentName: "Existing Student",
       courseName: monthlyFeeData.courseName,
-      courseId: 1, // Default course ID for monthly fee
     });
     setError("");
     setStep("payment");
@@ -141,58 +142,124 @@ export default function PaymentPage() {
     setStep("success");
   };
 
-  const handleDownloadReceipt = () => {
-    const displayAmount = isMonthlyFee
-      ? "₹10,000"
-      : getCourses().find((c) => c.id === application?.courseId)?.fee;
+  // const handleDownloadReceipt = () => {
+  //   const displayAmount = isMonthlyFee
+  //     ? "₹10,000"
+  //     : getCourses().find((c) => c.id === application?.courseId)?.fee;
 
-    const receiptContent = `
-ADHYAN ACADEMY
-Leading Coaching Institute
-================================================
+  //     const receiptContent = `
+  // ADHYAN ACADEMY
+  // Leading Coaching Institute
+  // ================================================
 
-PAYMENT RECEIPT
-================================================
+  // PAYMENT RECEIPT
+  // ================================================
 
-Receipt ID:        ${paymentId}
-Date:              ${new Date().toLocaleDateString("en-IN")}
+  // Receipt ID:        ${paymentId}
+  // Date:              ${new Date().toLocaleDateString("en-IN")}
 
-STUDENT DETAILS:
-${isMonthlyFee ? `Student ID:        ${application?.id}` : `Application ID:    ${application?.id}`}
-${!isMonthlyFee ? `Student Name:      ${application?.studentName}` : ""}
-Course:            ${application?.courseName}
+  // STUDENT DETAILS:
+  // ${isMonthlyFee ? `Student ID:        ${application?.id}` : `Application ID:    ${application?.id}`}
+  // ${!isMonthlyFee ? `Student Name:      ${application?.studentName}` : ""}
+  // Course:            ${application?.courseName}
 
-PAYMENT DETAILS:
-${isMonthlyFee ? "Monthly Fee:" : "Total Amount:"}       ${displayAmount}
-UPI ID:            ${paymentData.upiId}
-Transaction ID:    ${paymentData.transactionId}
-Payment Status:    Pending Verification
+  // PAYMENT DETAILS:
+  // ${isMonthlyFee ? "Monthly Fee:" : "Total Amount:"}       ${displayAmount}
+  // UPI ID:            ${paymentData.upiId}
+  // Transaction ID:    ${paymentData.transactionId}
+  // Payment Status:    Pending Verification
 
-================================================
+  // ================================================
 
-This receipt confirms that your payment has been 
-submitted and is under verification.
+  // This receipt confirms that your payment has been
+  // submitted and is under verification.
 
-You will receive a confirmation email once the
-payment is verified by our team within 24 hours.
+  // You will receive a confirmation email once the
+  // payment is verified by our team within 24 hours.
 
-For any queries, please contact:
-Phone: +91 98765 43210
-Email: info@excelacademy.com
+  // For any queries, please contact:
+  // Phone: +91 98765 43210
+  // Email: info@excelacademy.com
 
-================================================
-Thank you for choosing Excel Academy!
+  // ================================================
+  // Thank you for choosing Adhyan Academy!
+  // `;
+  const receiptContent = `
+<div
+  id="receipt-pdf"
+  className="hidden p-8 w-200 bg-white text-black font-sans"
+>
+  <div className="text-center mb-6">
+    <h1 className="text-2xl font-bold">ADHYAN ACADEMY</h1>
+    <p className="text-sm">Leading Coaching Institute</p>
+  </div>
+
+  <hr className="my-4" />
+
+  <h2 className="text-xl font-semibold text-center mb-4">
+    PAYMENT RECEIPT
+  </h2>
+
+  <div className="space-y-2 text-sm">
+    <p><b>Receipt ID:</b> {paymentId}</p>
+    <p><b>Date:</b> {new Date().toLocaleDateString("en-IN")}</p>
+
+    <hr />
+
+    <p><b>Student ID:</b> {application?.id}</p>
+    <p><b>Name:</b> {application?.studentName}</p>
+    <p><b>Course:</b> {application?.courseName}</p>
+
+    <hr />
+
+    <p><b>Amount:</b> ₹{displayAmount}</p>
+    <p><b>UPI:</b> {paymentData.upiId}</p>
+    <p><b>Txn ID:</b> {paymentData.transactionId}</p>
+    <p><b>Status:</b> Pending Verification</p>
+  </div>
+
+  <hr className="my-6" />
+
+  <p className="text-xs text-center">
+    This receipt confirms payment submission.<br />
+    Verification within 24 hours.
+  </p>
+
+  <p className="mt-6 text-center font-medium">
+    Thank you for choosing Adhyan Academy
+  </p>
+</div>
+
 `;
 
-    const blob = new Blob([receiptContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `payment-receipt-${paymentId}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  // const blob = new Blob([receiptContent], { type: "text/plain" });
+  // const url = URL.createObjectURL(blob);
+  // const a = document.createElement("a");
+  // a.href = url;
+  // a.download = `payment-receipt-${paymentId}.txt`;
+  // document.body.appendChild(a);
+  // a.click();
+  // document.body.removeChild(a);
+  // URL.revokeObjectURL(url);
+
+  const handleDownloadReceipt = () => {
+    const element = document.getElementById("receipt-pdf");
+
+    if (!element) return;
+
+    const options = {
+      margin: 0.5,
+      filename: `receipt-${paymentId}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: {
+        unit: "in",
+        format: "a4",
+        orientation: "portrait",
+      },
+    };
+
+    html2pdf().set(options).from(element).save();
   };
 
   if (step === "success") {
@@ -348,12 +415,16 @@ Thank you for choosing Excel Academy!
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="bg-muted p-4 rounded-lg space-y-3">
-                      <div className="flex flex-col items-center justify-between">
+                  <div className="bg-muted p-4 rounded-lg space-y-3">
+                    <div className="flex flex-col items-center justify-between">
                       <div className="flex justify-start">
                         <div>
-                          <p className="text-sm text-muted-foreground">UPI ID</p>
-                          <p className="font-mono font-semibold">academy@paytm</p>
+                          <p className="text-sm text-muted-foreground">
+                            UPI ID
+                          </p>
+                          <p className="font-mono font-semibold">
+                            academy@paytm
+                          </p>
                         </div>
                         <Button
                           size="sm"
@@ -369,7 +440,7 @@ Thank you for choosing Excel Academy!
                         </Button>
                       </div>
                       <Image
-                        src="/QR.jpeg" // inside 
+                        src="/Untitled.jpeg" // inside
                         alt="Profile"
                         width={300}
                         height={300}
@@ -558,21 +629,21 @@ Thank you for choosing Excel Academy!
                 <CardContent>
                   <form onSubmit={handleMonthlyFeeSubmit} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="studentId">Student ID</Label>
+                      <Label htmlFor="applicationId">Application ID</Label>
                       <Input
-                        id="studentId"
-                        value={monthlyFeeData.studentId}
+                        id="applicationId"
+                        value={monthlyFeeData.applicationId}
                         onChange={(e) =>
                           setMonthlyFeeData((prev) => ({
                             ...prev,
-                            studentId: e.target.value,
+                            applicationId: e.target.value,
                           }))
                         }
-                        placeholder="STU1234567890"
+                        placeholder="APP1234567890"
                         required
                       />
                       <p className="text-xs text-muted-foreground">
-                        Enter your Student ID provided after admission
+                        Enter your Application ID provided after admission
                         confirmation
                       </p>
                     </div>
@@ -581,12 +652,17 @@ Thank you for choosing Excel Academy!
                       <Label htmlFor="courseName">Enrolled Course</Label>
                       <Select
                         value={monthlyFeeData.courseName}
-                        onValueChange={(value) =>
+                        onValueChange={(value) => {
+                          const selectedCourse = courses.find(
+                            (course) => course.name === value,
+                          );
+
                           setMonthlyFeeData((prev) => ({
                             ...prev,
                             courseName: value,
-                          }))
-                        }
+                            amount: selectedCourse?.fee || 0,
+                          }));
+                        }}
                         required
                       >
                         <SelectTrigger id="courseName">
