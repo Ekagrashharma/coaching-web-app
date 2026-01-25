@@ -150,10 +150,12 @@ export function updateApplication(id: string, updates: Partial<Application>) {
   }
 }
 
-export function getApplicationById(id: string): Application | null {
+export function getApplicationById(id: string): Application | "APP325465478" {
   const applications = getApplications()
+
  // return applications.find((app)=>app.id)|| "APP3467575468"
-   return applications.find((app) => app.id === id) || null
+   return applications.find((app) => app.id === id) || "APP325465478"
+
 }
 
 // Payment management
@@ -189,7 +191,7 @@ export function getPaymentById(id: string): Payment | null {
 
 // Course data
 export function getCourses(): Course[] {
-  return []
+  return coursesData
 }
 
 export function getCourseById(id: number): Course | null {

@@ -52,12 +52,12 @@ export default function AdminDashboard() {
     loadData()
     setSelectedApplication(null)
   }
-
+*/
   const handlePaymentAction = (id: string, status: "verified" | "rejected") => {
     updatePayment(id, { status })
     loadData()
     setSelectedPayment(null)
-  }*/
+  }
 
   if (!user || user.role !== "admin") {
     return null
@@ -65,8 +65,8 @@ export default function AdminDashboard() {
 
   const stats = {
     totalApplications: applications.length,
-    pendingApplications: applications.filter((a) => a.status === "pending").length,
-    approvedApplications: applications.filter((a) => a.status === "approved").length,
+    // pendingApplications: applications.filter((a) => a.status === "pending").length,
+    // approvedApplications: applications.filter((a) => a.status === "approved").length,
     totalPayments: payments.length,
     pendingPayments: payments.filter((p) => p.status === "pending").length,
     verifiedPayments: payments.filter((p) => p.status === "verified").length,
@@ -106,11 +106,11 @@ export default function AdminDashboard() {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="applications">
               Applications
-              {stats.pendingApplications > 0 && (
+              {/* {stats.pendingApplications > 0 && (
                 <Badge variant="destructive" className="ml-2 h-5 min-w-5 px-1">
                   {stats.pendingApplications}
                 </Badge>
-              )}
+              )} */}
             </TabsTrigger>
             <TabsTrigger value="payments">
               Payments
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <div className="flex items-center gap-2">
                     <Clock className="h-5 w-5 text-orange-500" />
-                    <span className="text-3xl font-bold">{stats.pendingApplications}</span>
+                    {/* <span className="text-3xl font-bold">{stats.pendingApplications}</span> */}
                   </div>
                 </CardContent>
               </Card>
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
                             <p className="font-medium">{app.studentName}</p>
                             <p className="text-sm text-muted-foreground">{app.courseName}</p>
                           </div>
-                          <Badge
+                          {/* <Badge
                             variant={
                               app.status === "approved"
                                 ? "default"
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
                             }
                           >
                             {app.status}
-                          </Badge>
+                          </Badge> */}
                         </div>
                       ))}
                     </div>
@@ -265,8 +265,8 @@ export default function AdminDashboard() {
                           <TableHead>Course</TableHead>
                           <TableHead>Email</TableHead>
                           <TableHead>Phone</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Actions</TableHead>
+                          {/* <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead> */}
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -277,7 +277,7 @@ export default function AdminDashboard() {
                             <TableCell className="text-sm">{app.courseName}</TableCell>
                             <TableCell className="text-sm">{app.email}</TableCell>
                             <TableCell className="text-sm">{app.phone}</TableCell>
-                            <TableCell>
+                            {/* <TableCell>
                               <Badge
                                 variant={
                                   app.status === "approved"
@@ -294,7 +294,7 @@ export default function AdminDashboard() {
                               <Button size="sm" variant="ghost" onClick={() => setSelectedApplication(app)}>
                                 <Eye className="h-4 w-4" />
                               </Button>
-                            </TableCell>
+                            </TableCell> */}
                           </TableRow>
                         ))}
                       </TableBody>
@@ -391,7 +391,7 @@ export default function AdminDashboard() {
                   <p className="text-sm text-muted-foreground">Application ID</p>
                   <p className="font-mono font-medium">{selectedApplication.id}</p>
                 </div>
-                <div>
+                {/* <div>
                   <p className="text-sm text-muted-foreground">Status</p>
                   <Badge
                     variant={
@@ -404,7 +404,7 @@ export default function AdminDashboard() {
                   >
                     {selectedApplication.status}
                   </Badge>
-                </div>
+                </div> */}
                 <div>
                   <p className="text-sm text-muted-foreground">Student Name</p>
                   <p className="font-medium">{selectedApplication.studentName}</p>
@@ -458,11 +458,11 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {selectedApplication.status === "pending" && (
+              {/* {selectedApplication.status === "pending" && (
                 <div className="flex gap-3 pt-4">
                   <Button
                     className="flex-1"
-                    onClick={() => handleApplicationAction(selectedApplication.id, "approved")}
+                    // onClick={() => handleApplicationAction(selectedApplication.id, "approved"}
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Approve
@@ -470,13 +470,13 @@ export default function AdminDashboard() {
                   <Button
                     className="flex-1"
                     variant="destructive"
-                    onClick={() => handleApplicationAction(selectedApplication.id, "rejected")}
+                    // onClick={() => handleApplicationAction(selectedApplication.id, "rejected")}
                   >
                     <XCircle className="mr-2 h-4 w-4" />
                     Reject
                   </Button>
                 </div>
-              )}
+              )} */}
             </div>
           )}
         </DialogContent>
