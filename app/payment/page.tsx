@@ -81,12 +81,12 @@ export default function PaymentPage() {
       return;
     }
 
-    if (app.status !== "approved") {
-      setError(
-        "Application is not approved yet. Please wait for admin approval.",
-      );
-      return;
-    }
+    // if (app.status !== "approved") {
+    //   setError(
+    //     "Application is not approved yet. Please wait for admin approval.",
+    //   );
+    //   return;
+    // }
     // if (app.status !== "approved") {
     //   setError(
     //     "Application is not approved yet. Please wait for admin approval.",
@@ -240,7 +240,7 @@ Thank you for choosing Excel Academy!
   // ================================================
   // Thank you for choosing Adhyan Academy!
   // `;
-  const receiptContent = `
+  const receiptContents = `
 <div
   id="receipt-pdf"
   className="hidden p-8 w-200 bg-white text-black font-sans"
@@ -298,25 +298,25 @@ Thank you for choosing Excel Academy!
   // document.body.removeChild(a);
   // URL.revokeObjectURL(url);
 
-  const handleDownloadReceipt = () => {
-    const element = document.getElementById("receipt-pdf");
+  // const handleDownloadReceipt = () => {
+  //   const element = document.getElementById("receipt-pdf");
 
-    if (!element) return;
+  //   if (!element) return;
 
-    const options = {
-      margin: 0.5,
-      filename: `receipt-${paymentId}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: {
-        unit: "in",
-        format: "a4",
-        orientation: "portrait",
-      },
-    };
+  //   const options = {
+  //     margin: 0.5,
+  //     filename: `receipt-${paymentId}.pdf`,
+  //     image: { type: "jpeg", quality: 0.98 },
+  //     html2canvas: { scale: 2 },
+  //     jsPDF: {
+  //       unit: "in",
+  //       format: "a4",
+  //       orientation: "portrait",
+  //     },
+  //   };
 
-    html2pdf().set(options).from(element).save();
-  };
+  //   html2pdf().set(options).from(element).save();
+  // };
 
   if (step === "success") {
     return (
@@ -600,7 +600,7 @@ Thank you for choosing Excel Academy!
                         </div>
                         {screenshotPreview && (
                           <div className="border rounded-lg p-2">
-                            <img
+                            <Image
                               src={screenshotPreview || "/placeholder.svg"}
                               alt="Payment screenshot"
                               className="max-h-48 mx-auto"
@@ -770,4 +770,5 @@ Thank you for choosing Excel Academy!
       </div>
     </div>
   );
+}
 }

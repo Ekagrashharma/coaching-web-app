@@ -2,6 +2,7 @@
 
 import type React from "react"
 
+import Image from "next/image"
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
@@ -11,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { GraduationCap, ArrowLeft, CheckCircle } from "lucide-react"
+import { GraduationCap, ArrowLeft, CheckCircle, Image } from "lucide-react"
 import { getCourses, saveApplication, type Application } from "@/lib/data-store"
 import { coursesData } from "@/utils/Constant/course.constant"
 
@@ -264,7 +265,7 @@ export default function ApplyPage() {
                           className="flex-1"
                         />
                         {photoPreview && (
-                          <img
+                          <Image
                             src={photoPreview || "/placeholder.svg"}
                             alt="Preview"
                             className="w-12 h-12 rounded object-cover"

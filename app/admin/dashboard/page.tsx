@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -29,18 +31,26 @@ export default function AdminDashboard() {
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [activeTab, setActiveTab] = useState("overview")
 
-  useEffect(() => {
-    if (!user || user.role !== "admin") {
-      router.push("/admin/login")
-      return
-    }
-    loadData()
-  }, [user, router])
+ 
 
   const loadData = () => {
     setApplications(getApplications())
     setPayments(getPayments())
   }
+  useEffect(() => {
+  if (!user || user.role !== "admin") {
+    router.push("/admin/login")
+    return
+  }
+
+  const loadData = () => {
+    setApplications(getApplications())
+    setPayments(getPayments())
+  }
+
+  loadData()
+}, [user, router])
+
 
   const handleLogout = () => {
     logout()
@@ -378,9 +388,12 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               {selectedApplication.photo && (
                 <div className="flex justify-center">
-                  <img
+                  
+                  <Image
                     src={selectedApplication.photo || "/placeholder.svg"}
                     alt="Student"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-lg object-cover border-2"
                   />
                 </div>
@@ -540,7 +553,7 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Payment Screenshot</p>
                   <div className="border rounded-lg p-2">
-                    <img
+                    <Image
                       src={selectedPayment.screenshot || "/placeholder.svg"}
                       alt="Payment screenshot"
                       className="max-h-96 mx-auto"
