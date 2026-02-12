@@ -569,7 +569,7 @@ export default function AdminDashboard() {
           )}
         </DialogContent>
       </Dialog>
-        </div>
-      </div>
-  )
+    </div>
+  </div>
+)
 }
