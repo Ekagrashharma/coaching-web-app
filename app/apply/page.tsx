@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { GraduationCap, ArrowLeft, CheckCircle } from "lucide-react"
-import { getCourses, saveApplication, type Application } from "@/lib/data-store"
+import { supabaseService, type Application } from "@/lib/supabase-service";
 import { coursesData } from "@/utils/Constant/course.constant"
 
 
@@ -25,7 +25,7 @@ export default function ApplyPage() {
   const [applicationId, setApplicationId] = useState("")
   const [photoPreview, setPhotoPreview] = useState<string>("")
 
-  const courses = getCourses()
+  const courses = coursesData
   const [formData, setFormData] = useState({
     studentName: "",
     fatherName: "",
@@ -59,38 +59,41 @@ export default function ApplyPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    const course = coursesData.find((c) => c.id === Number(formData.courseId))
-    if (!course) return
+    try {
+      const course = coursesData.find((c) => c.id === Number(formData.courseId))
+      if (!course) return;
 
-    const newApplication: Application = {
-      id: `APP${Date.now()}`,
-      studentName: formData.studentName,
-      fatherName: formData.fatherName,
-      motherName: formData.motherName,
-      email: formData.email,
-      phone: formData.phone,
-      dob: formData.dob,
-      gender: formData.gender,
-      address: formData.address,
-      city: formData.city,
-      state: formData.state,
-      pincode: formData.pincode,
-      courseId: course.id,
-      courseName: course.name,
-      class: formData.class,
-      school: formData.school,
-      percentage: formData.percentage,
-      status: "pending",
-      submittedAt: new Date().toISOString(),
-      photo: photoPreview,
+      const newApplication = await supabaseService.createApplication({
+        student_name: formData.studentName,
+        father_name: formData.fatherName,
+        mother_name: formData.motherName,
+        email: formData.email,
+        phone: formData.phone,
+        dob: formData.dob,
+        gender: formData.gender,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode,
+        course_id: course.id,
+        course_name: course.name,
+        class: formData.class,
+        school: formData.school,
+        percentage: formData.percentage,
+        status: "pending",
+        submitted_at: new Date().toISOString(),
+        photo: photoPreview,
+      });
+
+      setApplicationId(newApplication.id);
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Error creating application:", error);
+      // You might want to show an error message to the user here
     }
-
-    saveApplication(newApplication)
-    setApplicationId(newApplication.id)
-    setSubmitted(true)
   }
 
   if (submitted) {

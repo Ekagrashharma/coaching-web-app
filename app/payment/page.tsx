@@ -26,12 +26,8 @@ import {
   Check,
   Download,
 } from "lucide-react";
-import {
-  getApplicationById,
-  getCourses,
-  savePayment,
-  type Payment,
-} from "@/lib/data-store";
+import { supabaseService, type Payment } from "@/lib/supabase-service";
+import { getCourses } from "@/lib/data-store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -72,32 +68,24 @@ export default function PaymentPage() {
     setStep("payment");
   };
 
-  const handleLookup = (e: React.FormEvent) => {
+  const handleLookup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const app = getApplicationById(applicationId);
+    try {
+      const app = await supabaseService.getApplicationById(applicationId);
 
-    if (!app) {
-      setError("Application ID not found. Please check and try again.");
-      return;
+      if (!app) {
+        setError("Application ID not found. Please check and try again.");
+        return;
+      }
+
+      setApplication(app);
+      setError("");
+      setIsMonthlyFee(false);
+      setStep("payment");
+    } catch (error) {
+      console.error("Error fetching application:", error);
+      setError("Failed to fetch application. Please try again.");
     }
-
-    // if (app.status !== "approved") {
-    //   setError(
-    //     "Application is not approved yet. Please wait for admin approval.",
-    //   );
-    //   return;
-    // }
-    // if (app.status !== "approved") {
-    //   setError(
-    //     "Application is not approved yet. Please wait for admin approval.",
-    //   );
-    //   return;
-    // }
-
-    setApplication(app);
-    setError("");
-    setIsMonthlyFee(false);
-    setStep("payment");
   };
 
   const handleScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,36 +105,40 @@ export default function PaymentPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let paymentAmount = 0;
-    if (isMonthlyFee) {
-      paymentAmount = 10000; // Default monthly fee amount
-    } else {
-      paymentAmount = Number.parseInt(
-        getCourses()
-          .find((c) => c.id === application?.courseId)
-          ?.fee.replace(/[^0-9]/g, "") || "0",
-      );
+    try {
+      let paymentAmount = 0;
+      if (isMonthlyFee) {
+        paymentAmount = 10000; // Default monthly fee amount
+      } else {
+        paymentAmount = Number.parseInt(
+          getCourses()
+            .find((c) => c.id === application?.courseId)
+            ?.fee.replace(/[^0-9]/g, "") || "0",
+        );
+      }
+
+      const newPayment = await supabaseService.createPayment({
+        application_id: application.id,
+        student_name: application.student_name || application.studentName || "Existing Student",
+        course_name: application.course_name || application.courseName,
+        amount: paymentAmount,
+        upi_id: paymentData.upiId,
+        transaction_id: paymentData.transactionId,
+        status: "pending",
+        submitted_at: new Date().toISOString(),
+        screenshot: screenshotPreview,
+        payment_type: isMonthlyFee ? "monthly" : "admission",
+      });
+
+      setPaymentId(newPayment.id);
+      setStep("success");
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      setError("Failed to submit payment. Please try again.");
     }
-
-    const newPayment: Payment = {
-      id: `PAY${Date.now()}`,
-      applicationId: application.id,
-      studentName: application.studentName,
-      courseName: application.courseName,
-      amount: paymentAmount,
-      upiId: paymentData.upiId,
-      transactionId: paymentData.transactionId,
-      status: "pending",
-      submittedAt: new Date().toISOString(),
-      screenshot: screenshotPreview,
-    };
-
-    savePayment(newPayment);
-    setPaymentId(newPayment.id);
-    setStep("success");
   };
 
   const handleDownloadReceipt = () => {
