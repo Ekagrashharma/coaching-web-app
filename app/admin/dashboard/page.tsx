@@ -5,22 +5,24 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Sidebar } from "@/components/admin/sidebar"
 import { supabaseService, type Application, type Payment } from "@/lib/supabase-service"
-import { GraduationCap, LogOut, FileText, IndianRupee, CheckCircle, XCircle, Clock, Eye } from "lucide-react"
+import { FileText, IndianRupee, CheckCircle, XCircle, Clock, Eye } from "lucide-react"
 import Image from "next/image"
 
 export default function AdminDashboard() {
   const router = useRouter()
-  const [user, setUser] = useState({ name: "Admin", role: "admin" }) // Simplified for now
+  const [user, setUser] = useState({ name: "Admin", role: "admin" })
   const [applications, setApplications] = useState<Application[]>([])
   const [payments, setPayments] = useState<Payment[]>([])
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null)
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [activeTab, setActiveTab] = useState("overview")
   const [loading, setLoading] = useState(true)
+  const placeholderImage = "/placeholder.svg"
 
   const loadData = async () => {
     try {
@@ -97,7 +99,7 @@ export default function AdminDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
+            <TabsList className="mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="applications">
               Applications
@@ -375,7 +377,7 @@ export default function AdminDashboard() {
                 <div className="flex justify-center">
                   
                   <Image
-                    src={selectedApplication.photo || "/placeholder.svg"}
+                    src={selectedApplication.photo || placeholderImage}
                     alt="Student"
                     width={128}
                     height={128}
@@ -451,7 +453,7 @@ export default function AdminDashboard() {
                   <p className="font-medium">{selectedApplication.percentage}</p>
                 </div>
                 <div className="sm:col-span-2">
-                  <p className="text-sm text-muted-foreground">School/College</p>
+                  <p className="text-sm text-muted-foreground">School&#47;College</p>
                   <p className="font-medium">{selectedApplication.school}</p>
                 </div>
               </div>
@@ -539,7 +541,7 @@ export default function AdminDashboard() {
                   <p className="text-sm text-muted-foreground mb-2">Payment Screenshot</p>
                   <div className="border rounded-lg p-2">
                     <Image
-                      src={selectedPayment.screenshot || "/placeholder.svg"}
+                      src={selectedPayment.screenshot || placeholderImage}
                       alt="Payment screenshot"
                       className="max-h-96 mx-auto"
                     />
@@ -569,6 +571,5 @@ export default function AdminDashboard() {
       </Dialog>
         </div>
       </div>
-    </div>
   )
 }
