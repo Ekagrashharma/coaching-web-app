@@ -64,7 +64,7 @@ export default function ApplyPage() {
 
     try {
       const course = coursesData.find((c) => c.id === Number(formData.courseId))
-      if (!course) return;
+      if (!course) return
 
       const newApplication = await supabaseService.createApplication({
         student_name: formData.studentName,
